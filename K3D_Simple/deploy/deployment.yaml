@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flask-hello-world
+  labels:
+    app: flask-hello-world
+spec:
+  selector:
+    matchLabels:
+      app: flask-hello-world
+  template:
+    metadata:
+      labels:
+        app: flask-hello-world
+    spec:
+      containers:
+      - name: flask-hello-world
+        image: g0l14t/flask-hello-world
+        ports:
+        - containerPort: 5000
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 5000
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 5000
+        resources:
+          limits:
+            cpu: 100m
+            memory: 256Mi
+          requests:
+            cpu: 80m
+            memory: 128Mi
+
