@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: flask-hello-world
-        image: g0l14t/flask-hello-world
+        image: ghcr.io/dieguini/python-flask-sample
         ports:
         - containerPort: 5000
         livenessProbe:
