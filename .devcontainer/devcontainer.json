@@ -16,7 +16,8 @@
 		"ghcr.io/jungaretti/features/make:1": {},
 		"ghcr.io/devcontainers-contrib/features/neovim-apt-get:1": {},
 		"ghcr.io/lukewiwa/features/shellcheck:0": {},
-		"ghcr.io/devcontainers/features/aws-cli:1": {}
+		"ghcr.io/devcontainers/features/aws-cli:1": {},
+		"ghcr.io/rio/features/k3d:1": {}
 	},
 	"customizations": {
 		"vscode": {
