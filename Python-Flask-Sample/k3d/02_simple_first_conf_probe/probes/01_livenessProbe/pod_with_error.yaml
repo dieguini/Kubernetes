@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-flask-sample
+spec:                               # Desire state
+  selector:                         # Finds pod
+    matchLabels:
+      app: python-flask-sample
+  replicas: 3                       # Containers quantity
+  template:                         # When Kubernetes creates Pods then follow this template
+    metadata:
+      labels:
+        app: python-flask-sample
+    spec:
+      containers:
+      - name: python-flask-sample
+        image: ghcr.io/dieguini/python-flask-sample:main  # Don't use "latest" tag
+        imagePullPolicy: IfNotPresent                     # What to do if image not found
+        ports:
+        - containerPort: 5000
+        livenessProbe:
+          initialDelaySeconds: 2   # When to start probing?
+          timeoutSeconds: 4        # How long to wait if a successful response return?
+          failureThreshold: 3
+          httpGet:                 # How to probe? Via http in this case
+            path: /error
+            port: 5000
+        resources:
+          limits:
+            memory: "64Mi"
+            cpu: "256m"
+        

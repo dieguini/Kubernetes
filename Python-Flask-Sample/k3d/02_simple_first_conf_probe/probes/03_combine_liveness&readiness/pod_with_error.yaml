@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-flask-sample
+spec:
+  selector:
+    matchLabels:
+      app: python-flask-sample
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: python-flask-sample
+    spec:
+      containers:
+      - name: python-flask-sample
+        image: ghcr.io/dieguini/python-flask-sample:main
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5000
+        livenessProbe:
+          initialDelaySeconds: 2
+          timeoutSeconds: 4
+          tcpSocket:
+            port: 5000
+        readinessProbe:
+          initialDelaySeconds: 8
+          timeoutSeconds: 10
+          httpGet:
+            path: /error
+            port: 5000
