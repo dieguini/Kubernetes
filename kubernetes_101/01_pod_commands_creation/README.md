@@ -1,6 +1,6 @@
-# Kubernetes 101
+# Pod Commands
 
-Simple example
+First simple example to run a Pod
 
 ## Pre-requisits
 
