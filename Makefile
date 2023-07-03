@@ -9,7 +9,7 @@ all: config bash
 .PHONY: config
 config:
 	@echo "=========== [CONFIG] ==========="
-	 git config --global --add safe.directory '*'
+	git config --global --add safe.directory '*'
 
 .PHONY: bash
 bash:
