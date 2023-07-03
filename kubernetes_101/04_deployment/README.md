@@ -43,6 +43,14 @@ spec:
 kubectl get all
 ```
 
+## Commands
+
+### Create Deployment
+
+```shell
+kubectl deployment <deployment_name> --image=<image_name> --repliacas=<number>
+```
+
 ## Hands on Practice
 
 Test some of the files:
