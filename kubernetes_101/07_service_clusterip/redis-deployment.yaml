@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-deployment
+  labels:
+    app: redis
+    tier: back-end
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: redis
+      type: back-end
+  template:
+    metadata:
+      name: redis-pod
+      labels:
+        app: redis
+        type: back-end
+    spec:
+      containers:
+      - name: redis-container
+        image: redis:6.0.20-alpine3.18
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "256m"
+        ports:
+        - containerPort: 6379
