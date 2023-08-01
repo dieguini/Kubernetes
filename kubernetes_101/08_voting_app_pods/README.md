@@ -1,4 +1,4 @@
-# Voting App
+# Voting App - Pods
 
 ## Goals
 
@@ -45,18 +45,18 @@ Ok after some testing there is a correct way in deploying because of this:
 Test files, suggest order:
 
 1. Create the **DB**
-    - [Postgres Pod](postgres-pod.yaml)
-    - [Postgres Service](postgres-service.yaml)
+    - [Postgres Pod](00_postgres-pod.yaml)
+    - [Postgres Service](01_postgres-service.yaml)
 2. Create **Redis**
-    - [Redis Pod](redis-pod.yaml)
-    - [Redis Service](redis-service.yaml)
+    - [Redis Pod](02_redis-pod.yaml)
+    - [Redis Service](03_redis-service.yaml)
 3. Create **Worker**
-    - [Worker Pod](worker-pod.yaml)
+    - [Worker Pod](08_worker-pod.yaml)
 4. Create **Voting** and **Resulting App**
-    - [Voting App](voting-app-pod.yaml)
-    - [Voting Service](voting-app-service.yaml)
-    - [Resulting App](result-app-pod.yaml)
-    - [Resulting Service](result-app-service.yaml)
+    - [Voting App](04_voting-app-pod.yaml)
+    - [Voting Service](05_voting-app-service.yaml)
+    - [Resulting App](06_result-app-pod.yaml)
+    - [Resulting Service](07_result-app-service.yaml)
 
 Usefull command to create all
 
