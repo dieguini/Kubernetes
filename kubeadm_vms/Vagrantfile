@@ -62,8 +62,9 @@ Vagrant.configure("2") do |config|
         ]
       end
 
-      # masterNodeConfig.vm.provision "setup-dns", type: "shell", :path => "ubuntu/update-dns.sh"
-
+      masterNodeConfig.vm.provision "setup-dns", type: "shell" do |s|
+        s.path = "update-dns.sh"
+      end
     end
   end
 
@@ -91,8 +92,9 @@ Vagrant.configure("2") do |config|
         ]
       end
 
-      # workerNodeConfig.vm.provision "setup-dns", type: "shell", :path => "ubuntu/update-dns.sh"
-
+      workerNodeConfig.vm.provision "setup-dns", type: "shell" do |s|
+        s.path = "update-dns.sh"
+      end
     end
   end
 end
