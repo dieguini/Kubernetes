@@ -1,0 +1,98 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+require 'json'
+
+Vagrant.configure("2") do |config|
+  # Reading .json
+  keys = File.read('./keys.json')
+  parameters = JSON.parse(keys)
+
+  # Reading params
+  vm_generals = parameters['vm_generals']
+  vm_master_node = parameters['vm_master_node']
+  vm_worker_node = parameters['vm_worker_node']
+
+  # Disable automatic box update checking.
+  # Boxes will only be checked for updates when user runs
+  # `vagrant box outdated`. (Not recommended).
+  config.vm.box_check_update = false # Just for the demo
+
+  # boxes at https://vagrantcloud.com/search.
+  config.vm.box = vm_generals['image']
+
+  # START: DNS Entries fo shell script /etc/hosts
+  dns_entries = []
+  # Use a loop to add numbers to the array
+  (1..vm_master_node['node_count']).each do |i|
+    private_ip = vm_generals['network'] + vm_master_node['ip_start'] + "#{i}"
+    hostname = "kubemaster-#{i}"
+    dns_entries << "#{private_ip}  #{hostname}"
+  end
+
+  (1..vm_worker_node['node_count']).each do |i|
+    private_ip = vm_generals['network'] + vm_worker_node['ip_start'] + "#{i}"
+    hostname = "kubenode-#{i}"
+    dns_entries << "#{private_ip}  #{hostname}"
+  end
+  dns_entries = dns_entries.join(', ')
+  # END: DNS Entries fo shell script /etc/hosts
+
+  # Provision Master Nodes
+  (1..vm_master_node['node_count']).each do |i|
+    config.vm.define "kubemaster-#{i}" do |masterNodeConfig|
+      masterNodeConfig.vm.hostname = "kubemaster-#{i}"
+      #masterNodeConfig.vm.synced_folder ".", "/vagrant"
+      
+      masterNodeConfig.vm.provider :virtualbox do |vb|
+        vb.name = "kubemaster-#{i}"
+        vb.memory = vm_master_node['ram']
+        vb.cpus = vm_master_node['cpus']
+      end
+      
+      private_ip = vm_generals['network'] + vm_master_node['ip_start'] + "#{i}"
+      masterNodeConfig.vm.network :private_network, ip: "#{private_ip}"
+      masterNodeConfig.vm.network "forwarded_port", guest: 22, host: "#{2710 + i}"
+
+      masterNodeConfig.vm.provision "setup-hosts", type: "shell" do |s|
+        s.path = "setup-hosts.sh"
+        s.args = [
+          "enp0s8",
+          dns_entries
+        ]
+      end
+
+      # masterNodeConfig.vm.provision "setup-dns", type: "shell", :path => "ubuntu/update-dns.sh"
+
+    end
+  end
+
+  # Provision Worker Nodes
+  (1..vm_worker_node['node_count']).each do |i|
+    config.vm.define "kubenode-#{i}" do |workerNodeConfig|
+      workerNodeConfig.vm.hostname = "kubenode-#{i}"
+      #workerNodeConfig.vm.synced_folder ".", "/vagrant"
+      
+      workerNodeConfig.vm.provider :virtualbox do |vb|
+        vb.name = "kubenode-#{i}"
+        vb.memory = vm_worker_node['ram']
+        vb.cpus = vm_worker_node['cpus']
+      end
+      
+      private_ip = vm_generals['network'] + vm_worker_node['ip_start'] + "#{i}"
+      workerNodeConfig.vm.network :private_network, ip: "#{private_ip}"
+      workerNodeConfig.vm.network "forwarded_port", guest: 22, host: "#{2720 + i}"
+
+      workerNodeConfig.vm.provision "setup-hosts", type: "shell" do |s|
+        s.path = "setup-hosts.sh"
+        s.args = [
+          "enp0s8",
+          dns_entries
+        ]
+      end
+
+      # workerNodeConfig.vm.provision "setup-dns", type: "shell", :path => "ubuntu/update-dns.sh"
+
+    end
+  end
+end
