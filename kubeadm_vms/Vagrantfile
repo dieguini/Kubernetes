@@ -65,6 +65,23 @@ Vagrant.configure("2") do |config|
       masterNodeConfig.vm.provision "setup-dns", type: "shell" do |s|
         s.path = "update-dns.sh"
       end
+
+      # Containerd
+      masterNodeConfig.vm.provision "bridge_traffic", type: "shell" do |s|
+        s.path = "containerd/01_bridge_traffic.sh"
+      end
+      masterNodeConfig.vm.provision "02_verify_netmodules", type: "shell" do |s|
+        s.path = "containerd/02_verify_netmodules.sh"
+      end
+      masterNodeConfig.vm.provision "03_verify_sysvar", type: "shell" do |s|
+        s.path = "containerd/03_verify_sysvar.sh"
+      end
+      masterNodeConfig.vm.provision "04_containerd", type: "shell" do |s|
+        s.path = "containerd/04_containerd.sh"
+      end
+      masterNodeConfig.vm.provision "05_systemd_cgroupd", type: "shell" do |s|
+        s.path = "containerd/05_systemd_cgroupd.sh"
+      end
     end
   end
 
@@ -94,6 +111,23 @@ Vagrant.configure("2") do |config|
 
       workerNodeConfig.vm.provision "setup-dns", type: "shell" do |s|
         s.path = "update-dns.sh"
+      end
+
+      # Containerd
+      workerNodeConfig.vm.provision "01_bridge_traffic", type: "shell" do |s|
+        s.path = "containerd/01_bridge_traffic.sh"
+      end
+      workerNodeConfig.vm.provision "02_verify_netmodules", type: "shell" do |s|
+        s.path = "containerd/02_verify_netmodules.sh"
+      end
+      workerNodeConfig.vm.provision "03_verify_sysvar", type: "shell" do |s|
+        s.path = "containerd/03_verify_sysvar.sh"
+      end
+      workerNodeConfig.vm.provision "04_containerd", type: "shell" do |s|
+        s.path = "containerd/04_containerd.sh"
+      end
+      workerNodeConfig.vm.provision "05_systemd_cgroupd", type: "shell" do |s|
+        s.path = "containerd/05_systemd_cgroupd.sh"
       end
     end
   end
