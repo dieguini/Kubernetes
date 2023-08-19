@@ -93,7 +93,41 @@ You have to peak one depending on your system, kubelet should match
 ps -p 1
 ```
 
+### 6. Installing kubeadm, kubelet and kubectl
 
+- **kubeadm**: the command to bootstrap the cluster.
+- **kubelet**: the component that runs on all of the machines in your cluster and does things like starting pods and containers.
+- **kubectl**: the command line util to talk to your cluster.
+
+```shell
+vagrant provision --provision-with 06_install_kkk
+```
+
+## Kubemaster
+
+Specially read next [doc](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/#initializing-your-control-plane-node)
+
+### 1. Configure kubeadm
+
+**EXECUTE ONLY IN MASTER NODE**
+
+<ins>Explain</ins>
+
+```shell
+sudo kubeadm init --pod-network-cidr=<pods_cidr_block> --apiserver-advertise-address=<master_node_server>
+```
+
+<ins>If default parameters</ins>
+
+```shell
+sudo kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address=192.168.56.11
+```
+
+<ins>Result</ins>
+
+What is a similar expected
+
+![kubeadm_init_expected.png](assets/kubeadm_init_expected.png)
 
 ## Reference
 
