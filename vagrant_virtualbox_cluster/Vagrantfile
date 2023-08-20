@@ -5,8 +5,8 @@ require 'json'
 
 Vagrant.configure("2") do |config|
   # Reading .json
-  keys = File.read('./keys.json')
-  parameters = JSON.parse(keys)
+  variables = File.read('./variables.json')
+  parameters = JSON.parse(variables)
 
   # Reading params
   vm_generals = parameters['vm_generals']
