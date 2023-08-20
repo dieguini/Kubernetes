@@ -8,3 +8,13 @@ install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
 _deps
+
+# Vagrant
+.vagrant/
+
+# Log files (if you are creating logs in debug mode, uncomment this)
+*.log
+
+# PROJECT SPECIFICS
+
+## kubeadm_vms
