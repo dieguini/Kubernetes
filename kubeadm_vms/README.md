@@ -34,7 +34,11 @@ vagrant provision --provision-with setup-hosts
 
 ## Steps
 
-There will be some uncommented steps
+Ok now we have some sections on [Vagrant File](Vagrantfile) with 
+
+``!!!COMMENTED ON PURPOSE TO EXPLAIN FROM README.md!!!``
+
+Uncomment the code parts and please check what every scripts is doing
 
 ### 1. Bridge traffic
 
@@ -87,7 +91,7 @@ There are two cgroup drivers:
 
 You have to peak one depending on your system, kubelet should match
 
-<ins>How to know?</ins>
+<ins>How to know what your system uses?</ins>
 
 ```shell
 ps -p 1
@@ -117,6 +121,9 @@ Specially read next [doc](https://kubernetes.io/docs/setup/production-environmen
 sudo kubeadm init --pod-network-cidr=<pods_cidr_block> --apiserver-advertise-address=<master_node_server>
 ```
 
+- **pods_cidr_block**: IP Block for pods
+- **master_node_server**: IP of master server
+
 <ins>If default parameters</ins>
 
 ```shell
@@ -125,9 +132,75 @@ sudo kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address
 
 <ins>Result</ins>
 
-What is a similar expected
+Expected something similar
 
 ![kubeadm_init_expected.png](assets/kubeadm_init_expected.png)
+
+
+### 2. Getting access kube config
+
+```shell
+vagrant provision --provision-with kube_master
+```
+
+### 3. Deploying a pod network
+
+As specified in the image go to the link, there are a lot of network add-ons:
+
+https://kubernetes.io/docs/concepts/cluster-administration/addons/
+
+**Things to watch out for**
+
+https://www.weave.works/docs/net/latest/kubernetes/kube-addon/#-things-to-watch-out-for
+
+- If you do set the --cluster-cidr option on kube-proxy, make sure it matches the IPALLOC_RANGE given to Weave Net (see below).
+
+#### 3.1. Edit Weavenet
+
+[Changing Configuration Options](https://www.weave.works/docs/net/latest/kubernetes/kube-addon/#-changing-configuration-options)
+
+1. Get the deamon set
+
+```shell
+kubectl get ds -A
+```
+
+2. Edit Weavenet
+
+```shell
+kubectl edit ds weave-net -n kube-system
+```
+
+<ins>Result</ins>
+
+Expected something similar
+
+![weavenet_result.png](assets/weavenet_result.png)
+
+
+### 4. Joining worker nodes
+
+From the result image we get we want join the worker nodes
+
+<ins>Syntaxis</ins>
+```shell
+sudo kubeadn join <master_node_ip>:6443 --token <token> \
+--discovery-token-ca-cert-hash sha256:<hash>
+```
+
+<ins>Example</ins>
+```shell
+sudo kubeadn join 192.168.56.11:6443 --token rwtzh4.5cpv3euigt1rgww6 \
+--discovery-token-ca-cert-hash sha256:5qede91ceaU62cdea9758d8aeue12cd6ucc49Ubc27eedU7138ec597eUb9d6U46
+```
+
+### 5. Test!
+
+With some random pod 😁
+
+```shell
+kubectl run nginx --image=nginx
+```
 
 ## Reference
 
