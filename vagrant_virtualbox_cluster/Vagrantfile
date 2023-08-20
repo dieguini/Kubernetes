@@ -1,0 +1,162 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+require 'json'
+
+Vagrant.configure("2") do |config|
+  # Reading .json
+  variables = File.read('./variables.json')
+  parameters = JSON.parse(variables)
+
+  # Reading params
+  vm_generals = parameters['vm_generals']
+  vm_master_node = parameters['vm_master_node']
+  vm_worker_node = parameters['vm_worker_node']
+
+  # Disable automatic box update checking.
+  # Boxes will only be checked for updates when user runs
+  # `vagrant box outdated`. (Not recommended).
+  config.vm.box_check_update = false # Just for the demo
+
+  # boxes at https://vagrantcloud.com/search.
+  config.vm.box = vm_generals['image']
+
+  # START: DNS Entries fo shell script /etc/hosts
+  dns_entries = []
+  # Use a loop to add numbers to the array
+  (1..vm_master_node['node_count']).each do |i|
+    private_ip = vm_generals['network'] + vm_master_node['ip_start'] + "#{i}"
+    hostname = "kubemaster-#{i}"
+    dns_entries << "#{private_ip}  #{hostname}"
+  end
+
+  (1..vm_worker_node['node_count']).each do |i|
+    private_ip = vm_generals['network'] + vm_worker_node['ip_start'] + "#{i}"
+    hostname = "kubenode-#{i}"
+    dns_entries << "#{private_ip}  #{hostname}"
+  end
+  dns_entries = dns_entries.join(', ')
+  # END: DNS Entries fo shell script /etc/hosts
+
+  # Provision Master Nodes
+  (1..vm_master_node['node_count']).each do |i|
+    config.vm.define "kubemaster-#{i}" do |masterNodeConfig|
+      masterNodeConfig.vm.hostname = "kubemaster-#{i}"
+      #masterNodeConfig.vm.synced_folder ".", "/vagrant"
+      
+      masterNodeConfig.vm.provider :virtualbox do |vb|
+        vb.name = "kubemaster-#{i}"
+        vb.memory = vm_master_node['ram']
+        vb.cpus = vm_master_node['cpus']
+      end
+      
+      private_ip = vm_generals['network'] + vm_master_node['ip_start'] + "#{i}"
+      masterNodeConfig.vm.network :private_network, ip: "#{private_ip}"
+      masterNodeConfig.vm.network "forwarded_port", guest: 22, host: "#{2710 + i}"
+
+      masterNodeConfig.vm.provision "setup-hosts", type: "shell" do |s|
+        s.path = "setup-hosts.sh"
+        s.args = [
+          "enp0s8",
+          dns_entries
+        ]
+      end
+
+      masterNodeConfig.vm.provision "setup-dns", type: "shell" do |s|
+        s.path = "update-dns.sh"
+      end
+
+      # Start: Containerd
+      ## !!!COMMENTED ON PURPOSE TO EXPLAIN FROM README.md!!!
+
+      # masterNodeConfig.vm.provision "bridge_traffic", type: "shell" do |s|
+      #   s.path = "01_containerd/01_bridge_traffic.sh"
+      # end
+      # masterNodeConfig.vm.provision "02_verify_netmodules", type: "shell" do |s|
+      #   s.path = "01_containerd/02_verify_netmodules.sh"
+      # end
+      # masterNodeConfig.vm.provision "03_verify_sysvar", type: "shell" do |s|
+      #   s.path = "01_containerd/03_verify_sysvar.sh"
+      # end
+      # masterNodeConfig.vm.provision "04_containerd", type: "shell" do |s|
+      #   s.path = "01_containerd/04_containerd.sh"
+      # end
+      # masterNodeConfig.vm.provision "05_systemd_cgroupd", type: "shell" do |s|
+      #   s.path = "01_containerd/05_systemd_cgroupd.sh"
+      # end
+      # masterNodeConfig.vm.provision "06_install_kkk", type: "shell" do |s|
+      #   s.path = "01_containerd/06_install_kkk.sh"
+      # end
+      # End: Containerd
+      
+      # Kubeconfig copy
+      ## !!!COMMENTED ON PURPOSE TO EXPLAIN FROM README.md!!!
+      
+      # masterNodeConfig.vm.provision "kube_master", type: "shell" do |s|
+      #   s.path = "02_master_node/kube_master.sh"
+      # end
+
+      # Network
+      ## !!!COMMENTED ON PURPOSE TO EXPLAIN FROM README.md!!!
+
+      ## With weavenet
+      # masterNodeConfig.vm.provision "weavenet", type: "shell" do |s|
+      #   s.path = "03_pod_network/weavenet/weavenet_pod.sh"
+      # end
+
+    end
+  end
+
+  # Provision Worker Nodes
+  (1..vm_worker_node['node_count']).each do |i|
+    config.vm.define "kubenode-#{i}" do |workerNodeConfig|
+      workerNodeConfig.vm.hostname = "kubenode-#{i}"
+      #workerNodeConfig.vm.synced_folder ".", "/vagrant"
+      
+      workerNodeConfig.vm.provider :virtualbox do |vb|
+        vb.name = "kubenode-#{i}"
+        vb.memory = vm_worker_node['ram']
+        vb.cpus = vm_worker_node['cpus']
+      end
+      
+      private_ip = vm_generals['network'] + vm_worker_node['ip_start'] + "#{i}"
+      workerNodeConfig.vm.network :private_network, ip: "#{private_ip}"
+      workerNodeConfig.vm.network "forwarded_port", guest: 22, host: "#{2720 + i}"
+
+      workerNodeConfig.vm.provision "setup-hosts", type: "shell" do |s|
+        s.path = "setup-hosts.sh"
+        s.args = [
+          "enp0s8",
+          dns_entries
+        ]
+      end
+
+      workerNodeConfig.vm.provision "setup-dns", type: "shell" do |s|
+        s.path = "update-dns.sh"
+      end
+
+      # Start: Containerd
+      ## !!!COMMENTED ON PURPOSE TO EXPLAIN FROM README.md!!!
+      
+      # workerNodeConfig.vm.provision "01_bridge_traffic", type: "shell" do |s|
+      #   s.path = "01_containerd/01_bridge_traffic.sh"
+      # end
+      # workerNodeConfig.vm.provision "02_verify_netmodules", type: "shell" do |s|
+      #   s.path = "01_containerd/02_verify_netmodules.sh"
+      # end
+      # workerNodeConfig.vm.provision "03_verify_sysvar", type: "shell" do |s|
+      #   s.path = "01_containerd/03_verify_sysvar.sh"
+      # end
+      # workerNodeConfig.vm.provision "04_containerd", type: "shell" do |s|
+      #   s.path = "01_containerd/04_containerd.sh"
+      # end
+      # workerNodeConfig.vm.provision "05_systemd_cgroupd", type: "shell" do |s|
+      #   s.path = "01_containerd/05_systemd_cgroupd.sh"
+      # end
+      # workerNodeConfig.vm.provision "06_install_kkk", type: "shell" do |s|
+      #   s.path = "01_containerd/06_install_kkk.sh"
+      # end
+      # End: Containerd
+    end
+  end
+end
