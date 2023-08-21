@@ -2,6 +2,29 @@
 
 Here we are starting the configuration
 
+## Pre-requisits
+
+- Have [Vagrant Install](https://developer.hashicorp.com/vagrant/docs/installation)
+- Have [Virtual Box](https://www.virtualbox.org/wiki/Downloads)
+
+## Up
+
+To start
+
+```shell
+vagrant up
+```
+
+<ins>To check</ins>
+
+```
+vagrant status
+```
+
+<ins>Expected (If default)</ins>
+
+![vagrant_status](assets/vagrant_status.png)
+
 ## Connect
 
 ```shell
@@ -14,7 +37,7 @@ vagrant ssh <name_of_vm>
 vagrant ssh kubemaster-1
 ```
 
-## Manual Provisioning
+## Manual Provisioning (Optional)
 
 In case you want to provision
 
@@ -97,6 +120,12 @@ You have to peak one depending on your system, kubelet should match
 ps -p 1
 ```
 
+<ins>Proceed</ins>
+
+```shell
+vagrant provision --provision-with 05_systemd_cgroupd
+```
+
 ### 6. Installing kubeadm, kubelet and kubectl
 
 - **kubeadm**: the command to bootstrap the cluster.
@@ -164,8 +193,13 @@ https://www.weave.works/docs/net/latest/kubernetes/kube-addon/#-things-to-watch-
 ```shell
 kubectl get ds -A
 ```
+2. Provision Weavenet
 
-2. Edit Weavenet
+```shell
+vagrant provision --provision-with weavenet
+```
+
+3. Edit Weavenet
 
 ```shell
 kubectl edit ds weave-net -n kube-system
