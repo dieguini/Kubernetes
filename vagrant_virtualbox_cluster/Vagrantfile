@@ -69,7 +69,7 @@ Vagrant.configure("2") do |config|
       # Start: Containerd
       ## !!!COMMENTED ON PURPOSE TO EXPLAIN FROM README.md!!!
 
-      # masterNodeConfig.vm.provision "bridge_traffic", type: "shell" do |s|
+      # masterNodeConfig.vm.provision "01_bridge_traffic", type: "shell" do |s|
       #   s.path = "01_containerd/01_bridge_traffic.sh"
       # end
       # masterNodeConfig.vm.provision "02_verify_netmodules", type: "shell" do |s|
