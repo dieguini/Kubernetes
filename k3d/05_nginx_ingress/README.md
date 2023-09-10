@@ -14,17 +14,19 @@ Two ways:
 #### 1. Create cluster (!Important)
 
 ```sh
-k3d cluster create mycluster --api-port 127.0.0.1:6445 --servers 3 --agents 2 --k3s-arg "--disable=traefik@server:*" --k3s-arg "--tls-san=127.0.0.1@server:*" --k3s-arg "--disable=servicelb@server:*"
+k3d cluster create mycluster --api-port 127.0.0.1:6445 --servers 1 --agents 2 --k3s-arg "--disable=traefik@server:*" --k3s-arg "--tls-san=127.0.0.1@server:*" --k3s-arg "--disable=servicelb@server:*"
 ```
 
 <ins>Understanding</ins>
 
 Most important part is disabling:
 
-- The automatic _Traefik Pod_ that k3d cluster creates
-- Disabling the _Servicelb_ because we will implemented
+- _Traefik Pod_, it creates an automatic ingress Pod (Default with k3d)
+- Disabling the _Servicelb_ because we will implemented our own, args that does this
 
-- CLI: `--k3s-arg "--disable=traefik@server:*" --k3s-arg "--tls-san=127.0.0.1@server:*`
+```shell
+--k3s-arg "--disable=traefik@server:*" --k3s-arg "--tls-san=127.0.0.1@server:*
+```
 
 #### 2. Deploy de neccesary
 
@@ -92,7 +94,7 @@ helm install main nginx-stable/nginx-ingress
 1. Forward
 
 ```sh
-kubectl port-forward service/main-nginx-ingress 7778:80
+kubectl port-forward service/main-nginx-ingress-controller 80:80
 ```
 
 2. Curl It!
@@ -100,10 +102,20 @@ kubectl port-forward service/main-nginx-ingress 7778:80
 Need to pass a Header
 
 ```sh
-curl -H "Host: my.podinfo.local" 127.0.0.1:7778
+curl -H "Host: my.podinfo.local" 127.0.0.1
 ```
 
 **NOTE**: Json should appear
+
+3. (Optional) Edit your hosts file
+
+Add
+
+```
+127.0.0.1 my.podinfo.local
+```
+
+Come on access it: http://my.podinfo.local
 
 ### YAML
 
@@ -200,7 +212,7 @@ helm install main nginx-stable/nginx-ingress
 1. Forward
 
 ```sh
-kubectl port-forward service/main-nginx-ingress 7778:80
+kubectl port-forward service/main-nginx-ingress-controller 80:80
 ```
 
 2. Curl It!
@@ -208,7 +220,17 @@ kubectl port-forward service/main-nginx-ingress 7778:80
 Need to pass a Header
 
 ```sh
-curl -H "Host: my.podinfo.local" 127.0.0.1:7778
+curl -H "Host: my.podinfo.local" 127.0.0.1
 ```
 
 **NOTE**: Json should appear
+
+3. (Optional) Edit your hosts file
+
+Add
+
+```
+127.0.0.1 my.podinfo.local
+```
+
+Come on access it: http://my.podinfo.local
