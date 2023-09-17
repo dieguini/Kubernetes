@@ -23,7 +23,8 @@
 		"vscode": {
 			"extensions": [
 				"ms-kubernetes-tools.vscode-kubernetes-tools",
-				"ms-vscode.makefile-tools"
+				"ms-vscode.makefile-tools",
+				"timonwong.shellcheck"
 			]
 		}
 	}
