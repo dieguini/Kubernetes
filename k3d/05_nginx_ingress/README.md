@@ -7,7 +7,7 @@ Lets start a cluster that doesnt implement traefik by default
 Two ways:
 
 - CLI: Understand this with [CLI](#cli)
-- YAML: Know that you know CLI check [YAML](#yaml)
+- YAML: Know that you know CLI, understand it with [YAML](#yaml)
 
 ### CLI
 
@@ -129,8 +129,8 @@ k3d cluster create --config myk3dcluster.yaml
 
 Most important part is disabling:
 
-- The automatic _Traefik Pod_ that k3d cluster creates
-- Disabling the _Servicelb_ because we will implemented
+- _Traefik Pod_, it creates an automatic ingress Pod (Default with k3d)
+- Disabling the _Servicelb_ because we will implemented our own, args that does this
 
 ```yaml
 ...

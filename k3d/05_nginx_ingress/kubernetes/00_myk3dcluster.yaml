@@ -2,7 +2,7 @@
 apiVersion: k3d.io/v1alpha3 # this will change in the future as we make everything more stable
 kind: Simple # internally, we also have a Cluster config, which is not yet available externally
 name: mycluster # name that you want to give to your cluster (will still be prefixed with `k3d-`)
-servers: 3 # same as `--servers 3`
+servers: 1 # same as `--servers 1`
 agents: 2 # same as `--agents 2`
 kubeAPI: # same as `--api-port myhost.my.domain:6445` (where the name would resolve to 127.0.0.1)
   hostIP: "127.0.0.1" # where the Kubernetes API will be listening on
