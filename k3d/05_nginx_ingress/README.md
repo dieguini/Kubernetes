@@ -6,15 +6,15 @@ Lets start a cluster that doesnt implement traefik by default
 
 Two ways:
 
-- CLI: Understand this with [CLI](#cli)
-- YAML: Know that you know CLI, understand it with [YAML](#yaml)
+- **CLI**: Understand this with [CLI](#cli)
+- **YAML**: Know that you know CLI, understand it with [YAML](#yaml)
 
 ### CLI
 
 #### 1. Create cluster (!Important)
 
 ```sh
-k3d cluster create mycluster --api-port 127.0.0.1:6445 --servers 1 --agents 2 --k3s-arg "--disable=traefik@server:*" --k3s-arg "--tls-san=127.0.0.1@server:*" --k3s-arg "--disable=servicelb@server:*"
+k3d cluster create mycluster --api-port 6445 -p "8081:80@loadbalancer" --servers 1 --agents 2 --k3s-arg "--disable=traefik@server:*" --k3s-arg "--tls-san=127.0.0.1@server:*" --k3s-arg "--disable=servicelb@server:*"
 ```
 
 <ins>Understanding</ins>
@@ -41,6 +41,9 @@ kubectl create deployment podinfo --image=stefanprodan/podinfo --port=9898
 <ins>Test It!</ins>
 
 ```sh
+# Get Pods
+kubectl get pods
+# Port Forwarding
 kubectl port-forward pod/podinfo-<SOME_RANDOM_CHARS> 8888:9898
 ```
 
@@ -74,27 +77,30 @@ This will still not work because:
 
 - `--class=nginx`: We didnt install a _Nginx Pod_
 
-2. Install Nginx Controller
-
-We are just adding the _repo_
+2. Install Nginx Controller (Helm way)
 
 ```sh
-helm repo add nginx-stable https://helm.nginx.com/stable
-helm repo update
+# Creating the namespace
+kubectl create ns ingress-nginx
+# Add latest repo
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+# Installing the latests ingress
+helm install -f nginx-controller/values.yaml ingress-nginx/ingress-nginx --generate-name -n ingress-nginx
 ```
 
-3. Now create a _Pod_ via _helm_
-
-```sh
-helm install main nginx-stable/nginx-ingress
-```
+- `-f`: Custom values (Check value.yaml)
+- `--generate-name`: Random name
+- `-n`: Namespace were is deployed
 
 <ins>Test It!</ins>
 
 1. Forward
 
 ```sh
-kubectl port-forward service/main-nginx-ingress-controller 80:80
+# Get Pods
+kubectl get pods -n ingress-nginx
+# Port forwarding (Service)
+kubectl port-forward service/ingress-nginx-<RANDOM-CHARTS>-controller 80:80 -n ingress-nginx
 ```
 
 2. Curl It!
@@ -102,7 +108,7 @@ kubectl port-forward service/main-nginx-ingress-controller 80:80
 Need to pass a Header
 
 ```sh
-curl -H "Host: my.podinfo.local" 127.0.0.1
+curl -H "Host: my.podinfo.local" 127.0.0.1:6445
 ```
 
 **NOTE**: Json should appear
@@ -122,7 +128,7 @@ Come on access it: http://my.podinfo.local
 #### 1. Create cluster (!Important)
 
 ```sh
-k3d cluster create --config myk3dcluster.yaml
+k3d cluster create --config cluster/00_myk3dcluster.yaml
 ```
 
 <ins>Understanding</ins>
@@ -186,33 +192,33 @@ Ingress is the viatal part of this explanation so
 1. Ingress
 
 ```sh
-ubectl apply -f 03_ingress.yamlingress.yaml
+kubectl apply -f 03_ingress.yamlingress.yaml
 ```
 This will still not work because:
 
 - `--class=nginx`: We didnt install a _Nginx Pod_
 
-2. Install Nginx Controller
-
-We are just adding the _repo_
+2. Install Nginx Controller (Helm way)
 
 ```sh
-helm repo add nginx-stable https://helm.nginx.com/stable
-helm repo update
+# Creating the namespace
+kubectl create ns ingress-nginx
+# Add latest repo
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+# Installing the latests ingress
+helm install -f nginx-controller/values.yaml ingress-nginx/ingress-nginx --generate-name -n ingress-nginx
 ```
 
-3. Now create a _Pod_ via _helm_
-
-```sh
-helm install main nginx-stable/nginx-ingress
-```
+- `-f`: Custom values (Check value.yaml)
+- `--generate-name`: Random name
+- `-n`: Namespace were is deployed
 
 <ins>Test It!</ins>
 
 1. Forward
 
 ```sh
-kubectl port-forward service/main-nginx-ingress-controller 80:80
+kubectl port-forward service/xxxxxx 80:80
 ```
 
 2. Curl It!
@@ -220,7 +226,7 @@ kubectl port-forward service/main-nginx-ingress-controller 80:80
 Need to pass a Header
 
 ```sh
-curl -H "Host: my.podinfo.local" 127.0.0.1
+curl -H "Host: my.podinfo.local" 127.0.0.1:6445
 ```
 
 **NOTE**: Json should appear

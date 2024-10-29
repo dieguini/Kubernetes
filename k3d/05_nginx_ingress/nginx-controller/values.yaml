@@ -1,0 +1,13 @@
+## nginx configuration
+## Ref: https://github.com/kubernetes/ingress-nginx/blob/main/docs/user-guide/nginx-configuration/index.md
+##
+
+# -- Override the deployment namespace; defaults to .Release.Namespace
+controller:
+  kind: "DaemonSet"
+  service:
+    externalIPs:  # Worker Nodes Ips
+    - 172.19.0.3  # k3d-mycluster-agent-X
+    - 172.19.0.4  # k3d-mycluster-agent-X
+## Ref: https://kubernetes.io/docs/tutorials/services/source-ip/#source-ip-for-services-with-typeloadbalancer
+    externalTrafficPolicy: "Local"
