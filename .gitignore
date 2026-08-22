@@ -15,6 +15,9 @@ _deps
 # Log files (if you are creating logs in debug mode, uncomment this)
 *.log
 
+# Downloaded binaries (install them instead of committing them)
+kubectl
+
 # PROJECT SPECIFICS
 
 ## kubeadm_vms

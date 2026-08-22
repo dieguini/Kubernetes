@@ -18,7 +18,12 @@ spec:                               # Desire state
         imagePullPolicy: IfNotPresent                     # What to do if image not found
         ports:
         - containerPort: 5000
-                                        # THIS WILL GENERATE ERROR INTENTIONALLY 
+        readinessProbe:
+          initialDelaySeconds: 10                         # When to start probing?
+          timeoutSeconds: 4                               # How long to wait if a successful response return?
+          httpGet:                                        # How to probe? Via http in this case
+            path: /
+            port: 5000                                    # The port the app really listens on
         resources:
           limits:
             memory: "64Mi"

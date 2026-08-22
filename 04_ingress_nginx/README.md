@@ -1,6 +1,14 @@
-# K3D
+# NGINX Ingress
 
-Lets start a cluster that doesnt implement traefik by default
+Lets start a cluster that doesnt implement traefik by default, and bring our own
+ingress controller instead.
+
+## Variants
+
+| Folder | App | Notes |
+|--------|-----|-------|
+| [01_podinfo](01_podinfo) | `stefanprodan/podinfo` | The walkthrough below. Cluster, deployment, service, ingress and the controller, step by step |
+| [02_python_flask](02_python_flask) | `ghcr.io/dieguini/python-flask-sample` | Same idea with our own image, plus an explicit `IngressClass`. See [below](#python-flask-variant) |
 
 ## Usage
 
@@ -85,10 +93,10 @@ kubectl create ns ingress-nginx
 # Add latest repo
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 # Installing the latests ingress
-helm install -f nginx-controller/values.yaml ingress-nginx/ingress-nginx --generate-name -n ingress-nginx
+helm install -f 01_podinfo/nginx-controller/values.yaml ingress-nginx/ingress-nginx --generate-name -n ingress-nginx
 ```
 
-- `-f`: Custom values (Check value.yaml)
+- `-f`: Custom values (Check 01_podinfo/nginx-controller/values.yaml)
 - `--generate-name`: Random name
 - `-n`: Namespace were is deployed
 
@@ -128,7 +136,7 @@ Come on access it: http://my.podinfo.local
 #### 1. Create cluster (!Important)
 
 ```sh
-k3d cluster create --config cluster/00_myk3dcluster.yaml
+k3d cluster create --config 01_podinfo/cluster/00_myk3dcluster.yaml
 ```
 
 <ins>Understanding</ins>
@@ -160,7 +168,7 @@ options:
 1. Sample Deployment
 
 ```sh
-kubectl apply -f 01_deployment.yaml
+kubectl apply -f 01_podinfo/kubernetes/01_deployment.yaml
 ```
 
 <ins>Test It!</ins>
@@ -174,7 +182,7 @@ Come on access it: http://127.0.0.1:8888
 2. Expose Pod (Service)
 
 ```sh
-kubectl apply -f 02_service.yaml
+kubectl apply -f 01_podinfo/kubernetes/02_service.yaml
 ```
 
 <ins>Test It!</ins>
@@ -192,7 +200,7 @@ Ingress is the viatal part of this explanation so
 1. Ingress
 
 ```sh
-kubectl apply -f 03_ingress.yamlingress.yaml
+kubectl apply -f 01_podinfo/kubernetes/03_ingress.yaml
 ```
 This will still not work because:
 
@@ -206,10 +214,10 @@ kubectl create ns ingress-nginx
 # Add latest repo
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 # Installing the latests ingress
-helm install -f nginx-controller/values.yaml ingress-nginx/ingress-nginx --generate-name -n ingress-nginx
+helm install -f 01_podinfo/nginx-controller/values.yaml ingress-nginx/ingress-nginx --generate-name -n ingress-nginx
 ```
 
-- `-f`: Custom values (Check value.yaml)
+- `-f`: Custom values (Check 01_podinfo/nginx-controller/values.yaml)
 - `--generate-name`: Random name
 - `-n`: Namespace were is deployed
 
@@ -240,3 +248,50 @@ Add
 ```
 
 Come on access it: http://my.podinfo.local
+
+## Python Flask variant
+
+Same exercise with our own image, in [02_python_flask](02_python_flask). The difference
+is that here the `IngressClass` is declared explicitly instead of relying on the
+controller's default.
+
+### 1. Create cluster
+
+```sh
+k3d cluster create --config 02_python_flask/config.yaml
+```
+
+### 2. Deploy
+
+Everything at once (Deployment + Service + Ingress in a single file):
+
+```sh
+kubectl apply -f 02_python_flask/app.yaml
+```
+
+Or one resource at a time, which is the point of the exercise:
+
+```sh
+kubectl apply -f 02_python_flask/pod.yaml
+kubectl apply -f 02_python_flask/service.yaml
+kubectl apply -f 02_python_flask/ingress-class.yaml
+kubectl apply -f 02_python_flask/ingress.yaml
+```
+
+**NOTE**: `ingress-class.yaml` still uses `networking.k8s.io/v1beta1`, removed in
+Kubernetes 1.22. On a recent cluster bump it to `networking.k8s.io/v1`.
+
+### 3. Install the controller
+
+```sh
+helm repo add nginx-stable https://helm.nginx.com/stable
+helm repo update
+helm install main nginx-stable/nginx-ingress
+```
+
+<ins>Test It!</ins>
+
+```sh
+kubectl port-forward service/main-nginx-ingress-controller 8081:80
+curl 127.0.0.1:8081
+```

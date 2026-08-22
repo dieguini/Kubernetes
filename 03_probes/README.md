@@ -1,10 +1,21 @@
-# Python Flask Sample
+# Probes
 
-First yaml and cluster configurations and creations
+Playing with `livenessProbe` and `readinessProbe` on a Flask app, so you can see what
+each one does when it fails. Every folder ships two manifests: the working one and one
+that is broken on purpose.
 
-# Usage
+| Folder | Probe | What breaking it does |
+|--------|-------|-----------------------|
+| [01_liveness](01_liveness) | `livenessProbe` | Kubelet keeps killing and restarting the container, `RESTARTS` goes up |
+| [02_readiness](02_readiness) | `readinessProbe` | Pod stays `Running` but never `READY`, so the Service does not send traffic to it |
+| [03_liveness_readiness](03_liveness_readiness) | both | Both effects at once |
 
-## Cluster creation
+The base app (no probes) lives in [00_base_app](00_base_app) — start there if this is
+your first time.
+
+## Usage
+
+### 1. Cluster creation
 
 Creating a cluster with Load
 
@@ -22,36 +33,24 @@ k3d cluster list
 |-|-|-|-|
 |cluster-pfs|   1/1|       2/2|      true|
 
-## YAML order creation
+### 2. Ingress and Service
 
-Because this is a 'How to' learning proccess it is better to create one resource at a time and test with deletions what happend
-
-<ins>Order of creation</ins>
-
-- Ingress
+Because this is a 'How to' learning proccess it is better to create one resource at a
+time and test with deletions what happend
 
 ```sh
 kubectl create -f ingress.yaml
-```
-
-- Service
-
-```sh
 kubectl create -f service.yaml
 ```
 
-### Probes
+### 3. Pick a probe
 
-#### readinessProbe
-
-##### Error
-
-Know we will start playing with probes on de pod deployments
-
-- Test the pod with error with the [pod_with_error.yaml](probes/readinessProbe/pod_with_error.yaml)
+Deploy the broken one first, look at what the cluster tells you, then deploy the good
+one. Replace `<FOLDER>` with any of the folders in the table above.
 
 ```sh
-kubectl create -f probes/readinessProbe/pod_with_error.yaml
+# The one that fails on purpose
+kubectl create -f <FOLDER>/pod_with_error.yaml
 ```
 
 <ins>Result</ins>
@@ -66,22 +65,19 @@ kubectl describe pod/python-flask-sample-<SOME_RANDOM_NUMBER>
 
 2. Check the events, the important part is
 
-| Events: |           |                      |                   |                                                                                                                          |   |
-|---------|-----------|----------------------|-------------------|--------------------------------------------------------------------------------------------------------------------------|---|
-| Type    | Reason    | Age                  | From              | Message                                                                                                                  |   |
-| ----    | ------    | ----                 | ----              | -------                                                                                                                  |   |
-| Warning | Unhealthy | 14s (x29 over 4m24s) | kubelet           | Readiness probe failed: Get "http://10.42.2.6:9999/": dial tcp 10.42.2.6:9999: connect: connection refused               |   |
-|         |           |                      |                   |                                                                                                                          |   |
+| Type    | Reason    | Age                  | From    | Message                                                                                                    |
+|---------|-----------|----------------------|---------|------------------------------------------------------------------------------------------------------------|
+| Warning | Unhealthy | 14s (x29 over 4m24s) | kubelet | Readiness probe failed: Get "http://10.42.2.6:9999/": dial tcp 10.42.2.6:9999: connect: connection refused |
 
 Analyze what you see! Check YAML's! 😁👍
-Test all probes
+The trick is always the same: the probe points at a port or a path that is not there.
 
-##### Correct one
+3. Now the correct one
 
 ```sh
-kubectl create -f probes/readinessProbe/pod_with_error.yaml
+kubectl delete -f <FOLDER>/pod_with_error.yaml
+kubectl create -f <FOLDER>/pod.yaml
 ```
-
 
 <ins>Url</ins>
 

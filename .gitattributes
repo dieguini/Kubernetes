@@ -1,0 +1,3 @@
+# Scripts run inside Linux VMs/containers: CRLF would break the shebang line.
+*.sh        text eol=lf
+Vagrantfile text eol=lf

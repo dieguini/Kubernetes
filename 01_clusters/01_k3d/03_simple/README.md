@@ -17,5 +17,8 @@ k3d cluster create --config .\k3d.yaml
 Easily deploy the configuration of a _Python Flask_ example on my DockerHub
 
 ```sh
-kubectl apply -f --filename k8s\
+kubectl apply -f deploy/
 ```
+
+[deploy/](deploy) holds the Deployment, the Service and the Ingress. The cluster maps
+`80:80` on the loadbalancer, so open http://localhost
