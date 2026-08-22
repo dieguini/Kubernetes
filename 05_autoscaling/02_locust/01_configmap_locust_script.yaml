@@ -11,8 +11,8 @@ data:
 
     class WebSiteStressTestUsers(HttpUser):
         wait_time = between(0.7, 1.3)
-        
+
         @task
         def stress_test_users(self):
             self.client.get("/", headers={"Host": "my.podinfo.local"})
-    
+

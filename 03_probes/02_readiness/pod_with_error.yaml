@@ -23,9 +23,9 @@ spec:                               # Desire state
           timeoutSeconds: 4                               # How long to wait if a successful response return?
           httpGet:                                        # How to probe? Via http in this case
             path: /
-            port: 9999                                    # THIS WILL GENERATE ERROR INTENTIONALLY 
+            port: 9999                                    # THIS WILL GENERATE ERROR INTENTIONALLY
         resources:
           limits:
             memory: "64Mi"
             cpu: "256m"
-        
+

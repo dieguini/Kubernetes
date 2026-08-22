@@ -25,4 +25,4 @@ spec:
         - containerPort: 9898
       nodeSelector:          # PodSpec field, not a container field
         role: worker
-          
+

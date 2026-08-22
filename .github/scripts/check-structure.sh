@@ -7,7 +7,7 @@
 #   - no path needs shell escaping (this repo used to have a `&` in a folder name)
 set -uo pipefail
 
-cd "$(git rev-parse --show-toplevel)"
+cd "$(git rev-parse --show-toplevel)" || exit 1
 
 fail=0
 err() {

@@ -6,7 +6,7 @@
 # schema for those, so validating them would only produce false positives.
 set -euo pipefail
 
-cd "$(git rev-parse --show-toplevel)"
+cd "$(git rev-parse --show-toplevel)" || exit 1
 
 git ls-files -z '*.yaml' '*.yml' | while IFS= read -r -d '' file; do
     case "$file" in
