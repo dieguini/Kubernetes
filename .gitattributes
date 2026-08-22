@@ -1,0 +1,6 @@
+# This repo is written on Windows and consumed on Linux (Vagrant VMs, containers,
+# CI runners). CRLF breaks shebangs and shows up as an error in shellcheck/yamllint,
+# so everything textual is stored and checked out as LF.
+* text=auto eol=lf
+
+*.png binary

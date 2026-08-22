@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: locust-deployment
+  labels:
+    name: locust-deployment
+    app: locust
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: locust-pod
+      app: locust
+  template:
+    metadata:
+      name: locust-pod
+      labels:
+        name: locust-pod
+        app: locust
+    spec:
+      containers:
+      - name: locust-container
+        image: locustio/locust
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 8089
+        volumeMounts:
+        - mountPath: /home/locust
+          name: locust-script-volume
+      volumes:
+      - name: locust-script-volume
+        configMap:
+          name: locust-script-configmap
