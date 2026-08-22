@@ -1,0 +1,9 @@
+# These are teaching examples, so style is deliberately loose: what we care about is
+# that the YAML actually parses and has no duplicate keys. `relaxed` reports the rest
+# as warnings, which do not fail the build.
+extends: relaxed
+
+rules:
+  line-length: disable
+  truthy:
+    check-keys: false # `on:` in a workflow file is a key, not a boolean
