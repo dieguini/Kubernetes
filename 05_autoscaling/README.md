@@ -1,6 +1,6 @@
 # Autoscalling - Based on Traffic
 
-Hello fella! We are going to set a really god example on how to autoscale Pods based on traffic
+Hello fella! We are going to set a really good example on how to autoscale Pods based on traffic
 
 - Deploy and go
 - Undertan
