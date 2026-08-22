@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: flask-hello-world
-        image: ghcr.io/dieguini/python-flask-sample
+        image: ghcr.io/dieguini/python-flask-sample:main  # Don't use "latest", it does not exist
         ports:
         - containerPort: 5000
         livenessProbe:
