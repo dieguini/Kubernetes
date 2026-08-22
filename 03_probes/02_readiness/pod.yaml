@@ -28,4 +28,4 @@ spec:                               # Desire state
           limits:
             memory: "64Mi"
             cpu: "256m"
-        
+

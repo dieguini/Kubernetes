@@ -16,5 +16,5 @@ spec:
         backend:
           service:
             name: podinfo-service
-            port: 
+            port:
               number: 80

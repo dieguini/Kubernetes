@@ -16,4 +16,3 @@ spec:
             name: python-flask-sample
             port:
               number: 5000
-              

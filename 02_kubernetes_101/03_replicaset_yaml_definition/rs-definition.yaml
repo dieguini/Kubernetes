@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: ReplicaSet
 metadata:
   name: myapp-rs
-  labels: 
+  labels:
     app: myapp
     type: front-end
 spec:
